@@ -1,0 +1,1 @@
+"""Athlyt backend application package."""
