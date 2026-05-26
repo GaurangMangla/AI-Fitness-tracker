@@ -1,0 +1,82 @@
+[project]
+name = "athlyt-backend"
+version = "0.1.0"
+description = "Athlyt backend — FastAPI app serving auth, profiles, workout/diet generation, and ML-based workout recommendations."
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.115,<1.0",
+    "uvicorn[standard]>=0.32,<1.0",
+    "sqlalchemy>=2.0,<2.1",
+    "alembic>=1.13,<2.0",
+    "psycopg2-binary>=2.9,<3.0",
+    "pydantic>=2.9,<3.0",
+    "pydantic-settings>=2.5,<3.0",
+    "pyjwt>=2.9,<3.0",
+    "bcrypt>=4.2,<6.0",
+    "python-multipart>=0.0.12",
+    "email-validator>=2.2,<3.0",
+    # Pinned to the EXACT version (not a range) the model was pickled
+    # with. A range here (even one respecting sklearn-compat's <1.9
+    # constraint below) still lets pip resolve any version within it --
+    # e.g. 1.8.0 -- which silently differs from whatever exact version
+    # actually trained model.joblib and produces the same
+    # InconsistentVersionWarning this pin exists to eliminate. 1.5.2
+    # satisfies sklearn-compat's real constraint (a transitive dependency
+    # of another installed package, which requires scikit-learn<1.9) AND
+    # is the exact version used to train the current model.joblib -- see
+    # ml/models/metadata.json's "sklearn_version" field. If the model is
+    # ever retrained with a different scikit-learn version, update this
+    # pin to match exactly, not just to another value within a range.
+    "scikit-learn==1.5.2",
+    "joblib>=1.4,<2.0",
+    "pandas>=2.2,<3.0",
+    "reportlab>=4.2,<5.0",
+]
+
+[project.optional-dependencies]
+# ruff and black are pinned to EXACT versions, not ranges, deliberately.
+# A wide range let local dev and CI resolve different versions of the same
+# tool at different times — exactly what happened in practice. Exact pins
+# mean "if it's green on your machine, it's green in CI" is actually true.
+# Bump both deliberately (and re-run `ruff check .` / `black .` locally)
+# rather than letting a version range silently drift.
+dev = [
+    "ruff==0.15.20",
+    "black==25.12.0",
+    "pytest>=8.3,<9.0",
+    "httpx>=0.27,<1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# Note: no mypy here. For a full enterprise build (see the earlier architecture
+# discussion) strict mypy is worth the setup cost; for a one-week placement
+# project it's friction without payoff — ruff already catches most real bugs
+# (unused imports, undefined names, etc.) at a fraction of the configuration cost.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+# E501: line length — handled by black, not worth ruff duplicating.
+# UP042: "use enum.StrEnum instead of (str, Enum)" — deliberately ignored.
+# Every enum in app/models/enums.py intentionally inherits from (str, Enum),
+# not StrEnum, because that's the pattern SQLAlchemy's Enum column type and
+# Pydantic v2 schemas were built and tested against throughout this codebase.
+ignore = ["E501", "UP042"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
