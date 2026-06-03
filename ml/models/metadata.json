@@ -1,0 +1,142 @@
+{
+  "model_version": "v2.1",
+  "trained_at": "2026-07-21T11:38:24.846330+00:00",
+  "model_type": "RandomForestClassifier",
+  "dataset_size": 100000,
+  "dataset_path": "ml/data/dataset.csv",
+  "retrain_reason": "v2 was pickled with scikit-learn 1.9.0, which triggered InconsistentVersionWarning and required an exact-pin workaround that conflicted with sklearn-compat's real constraint (scikit-learn<1.9) found in a real user environment. Retrained identically (same dataset, seed, hyperparameters) with scikit-learn 1.5.2, which satisfies that constraint and is the version pip actually resolves by default for this project's `scikit-learn>=1.5,<2.0` range.",
+  "observed_classes": [
+    "bro_split",
+    "full_body",
+    "home_bodyweight",
+    "push_pull_legs",
+    "upper_lower",
+    "upper_lower_strength"
+  ],
+  "note_on_classes": "All 6 real split classes now appear, including bro_split (0.43% of the dataset -- rare but genuinely present, matching its real-world niche: advanced lifters training 5 days/week with full gym access).",
+  "model_size_mb": 78.1,
+  "best_hyperparameters": {
+    "class_weight": "balanced",
+    "max_depth": 15,
+    "n_estimators": 150
+  },
+  "cv_folds": 5,
+  "cv_f1_macro": 0.9892544745030817,
+  "test_accuracy": 0.994,
+  "test_precision_macro": 0.9915166334161079,
+  "test_recall_macro": 0.9976671123087946,
+  "test_f1_macro": 0.9945422388800397,
+  "per_class_metrics": {
+    "bro_split": {
+      "precision": 0.9848484848484849,
+      "recall": 1.0,
+      "f1-score": 0.9923664122137404,
+      "support": 65.0
+    },
+    "full_body": {
+      "precision": 0.9996357012750455,
+      "recall": 0.997093023255814,
+      "f1-score": 0.9983627433145352,
+      "support": 2752.0
+    },
+    "home_bodyweight": {
+      "precision": 1.0,
+      "recall": 0.9899573186040673,
+      "f1-score": 0.9949533181932879,
+      "support": 7966.0
+    },
+    "push_pull_legs": {
+      "precision": 0.9712601326455417,
+      "recall": 0.999620781190747,
+      "f1-score": 0.9852364044103906,
+      "support": 2637.0
+    },
+    "upper_lower": {
+      "precision": 0.9933554817275747,
+      "recall": 0.9993315508021391,
+      "f1-score": 0.996334555148284,
+      "support": 1496.0
+    },
+    "upper_lower_strength": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 84.0
+    },
+    "accuracy": 0.994,
+    "macro avg": {
+      "precision": 0.9915166334161079,
+      "recall": 0.9976671123087946,
+      "f1-score": 0.9945422388800397,
+      "support": 15000.0
+    },
+    "weighted avg": {
+      "precision": 0.9941523581249881,
+      "recall": 0.994,
+      "f1-score": 0.9940254074703505,
+      "support": 15000.0
+    }
+  },
+  "feature_columns": [
+    "gender",
+    "fitness_goal",
+    "activity_level",
+    "workout_experience",
+    "diet_preference",
+    "bmi_category",
+    "age",
+    "height_cm",
+    "weight_kg",
+    "bmi",
+    "workout_days_per_week",
+    "equipment_count",
+    "has_gym_access",
+    "equip_barbell",
+    "equip_dumbbells",
+    "equip_full_gym",
+    "equip_none",
+    "equip_pull_up_bar",
+    "equip_resistance_bands"
+  ],
+  "all_feature_importances": {
+    "remainder__workout_days_per_week": 0.33727602045676863,
+    "cat__workout_experience_advanced": 0.11779204881748119,
+    "remainder__equip_dumbbells": 0.0727401988128845,
+    "remainder__equip_none": 0.07101993325146001,
+    "cat__workout_experience_beginner": 0.0541981925551645,
+    "cat__workout_experience_intermediate": 0.04631173596862501,
+    "remainder__equip_full_gym": 0.04207314100110893,
+    "remainder__has_gym_access": 0.04004659461212425,
+    "cat__fitness_goal_muscle_gain": 0.02497056632418309,
+    "cat__fitness_goal_weight_loss": 0.02277849719222877,
+    "cat__fitness_goal_maintenance": 0.020448715891585943,
+    "remainder__height_cm": 0.01672417851458841,
+    "remainder__weight_kg": 0.0165704802213151,
+    "remainder__equipment_count": 0.016134535037432007,
+    "remainder__bmi": 0.015732775009115938,
+    "remainder__equip_barbell": 0.014195823611767043,
+    "remainder__age": 0.013097437739670374,
+    "cat__fitness_goal_general_fitness": 0.01023628730787317,
+    "remainder__equip_resistance_bands": 0.009869304258550022,
+    "remainder__equip_pull_up_bar": 0.006096051929296515,
+    "cat__activity_level_very_active": 0.004712876607034606,
+    "cat__activity_level_lightly_active": 0.0027939384493172554,
+    "cat__diet_preference_non_vegetarian": 0.002368937751635572,
+    "cat__activity_level_moderately_active": 0.0023276292307480486,
+    "cat__diet_preference_vegetarian": 0.002215988287630158,
+    "cat__gender_female": 0.002153188966363151,
+    "cat__gender_male": 0.0020737285949139956,
+    "cat__activity_level_sedentary": 0.0020611807395462447,
+    "cat__activity_level_extra_active": 0.001996574273582288,
+    "cat__bmi_category_normal": 0.0019702330183262854,
+    "cat__bmi_category_overweight": 0.0017283756980216516,
+    "cat__diet_preference_vegan": 0.001679240337589835,
+    "cat__gender_other": 0.0012840158235897412,
+    "cat__bmi_category_obese": 0.0012383451558114458,
+    "cat__bmi_category_underweight": 0.0010832285526662445
+  },
+  "train_size": 70040,
+  "val_size": 14960,
+  "test_size": 15000,
+  "sklearn_version": "1.5.2"
+}

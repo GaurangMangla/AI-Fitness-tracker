@@ -1,0 +1,4 @@
+rule_prediction,ml_prediction,ml_confidence,fitness_goal,workout_experience,workout_days_per_week,equipment_available
+home_bodyweight,push_pull_legs,0.461,muscle_gain,beginner,7,dumbbells
+home_bodyweight,push_pull_legs,0.522,muscle_gain,intermediate,7,dumbbells
+home_bodyweight,upper_lower,0.434,maintenance,beginner,6,"dumbbells,resistance_bands"
