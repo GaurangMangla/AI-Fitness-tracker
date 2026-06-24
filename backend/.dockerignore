@@ -1,0 +1,42 @@
+# Exclude everything not needed to build or run the backend image.
+# Keeping the build context small speeds up `docker build` significantly.
+
+# Version control
+.git
+.gitignore
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+.eggs
+dist
+build
+.venv
+venv
+
+# Development databases (never include in image)
+*.db
+*.sqlite3
+
+# Test artifacts
+.pytest_cache
+.ruff_cache
+htmlcov
+.coverage
+
+# Environment files (secrets must not be in the image)
+.env
+.env.*
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
