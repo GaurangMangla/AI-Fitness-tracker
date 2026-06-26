@@ -1,0 +1,33 @@
+# Exclude everything not needed for the Next.js build context.
+
+# Version control
+.git
+.gitignore
+
+# Dependencies (installed inside the container)
+node_modules
+
+# Next.js build output
+.next
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+# Test artifacts
+coverage
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# OS
+.DS_Store
+
+# Docker
+Dockerfile*
+.dockerignore
