@@ -1,0 +1,356 @@
+@import "tailwindcss";
+
+/*
+ * Design system tokens — Athlyt's palette: Indigo primary, Emerald accent,
+ * with dedicated success/warning/error semantic tokens (distinct from the
+ * single `destructive` shadcn ships with, since the spec calls for amber
+ * warnings as a distinct state from red errors). All values are oklch to
+ * match shadcn's own convention, hand-picked to land close to Tailwind's
+ * indigo-600/emerald-500/amber-500/red-500 reference points.
+ *
+ * `@custom-variant dark` makes `dark:` utilities respond to a `.dark` class
+ * on an ancestor (toggled by next-themes) rather than the OS-level
+ * `prefers-color-scheme` media query.
+ */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Off-white background, near-black foreground */
+  --background: oklch(0.99 0.002 247);
+  --foreground: oklch(0.18 0.014 257);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.014 257);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.014 257);
+
+  /* Indigo primary */
+  --primary: oklch(0.51 0.21 264);
+  --primary-foreground: oklch(0.98 0.005 248);
+
+  --secondary: oklch(0.96 0.008 264);
+  --secondary-foreground: oklch(0.27 0.03 264);
+
+  --muted: oklch(0.96 0.006 264);
+  --muted-foreground: oklch(0.52 0.02 260);
+
+  /* Emerald accent */
+  --accent: oklch(0.93 0.05 162);
+  --accent-foreground: oklch(0.27 0.08 162);
+
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.98 0.01 17);
+
+  --success: oklch(0.6 0.16 152);
+  --success-foreground: oklch(0.98 0.02 152);
+
+  --warning: oklch(0.75 0.16 75);
+  --warning-foreground: oklch(0.22 0.04 75);
+
+  --border: oklch(0.91 0.008 264);
+  --input: oklch(0.91 0.008 264);
+  --ring: oklch(0.51 0.21 264 / 50%);
+}
+
+.dark {
+  /* Near-black background */
+  --background: oklch(0.14 0.012 260);
+  --foreground: oklch(0.96 0.005 248);
+
+  --card: oklch(0.19 0.014 260);
+  --card-foreground: oklch(0.96 0.005 248);
+  --popover: oklch(0.19 0.014 260);
+  --popover-foreground: oklch(0.96 0.005 248);
+
+  /* Indigo primary, brightened for dark backgrounds */
+  --primary: oklch(0.71 0.16 264);
+  --primary-foreground: oklch(0.16 0.03 264);
+
+  --secondary: oklch(0.26 0.015 260);
+  --secondary-foreground: oklch(0.96 0.005 248);
+
+  --muted: oklch(0.24 0.014 260);
+  --muted-foreground: oklch(0.68 0.018 260);
+
+  /* Emerald accent, dimmed for dark backgrounds */
+  --accent: oklch(0.27 0.05 162);
+  --accent-foreground: oklch(0.86 0.1 162);
+
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.16 0.03 22);
+
+  --success: oklch(0.72 0.15 152);
+  --success-foreground: oklch(0.16 0.03 152);
+
+  --warning: oklch(0.78 0.15 80);
+  --warning-foreground: oklch(0.18 0.03 80);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.71 0.16 264 / 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/*
+ * Small, dependency-free animation + visual utilities. Tailwind v4 has no
+ * built-in `animate-in`/`fade-in` set the way v3 + tailwindcss-animate did,
+ * and not every motion need (shimmer, glass cards, gradient text) is worth
+ * pulling Framer Motion in for — those stay CSS-only; Framer Motion (now a
+ * dependency) is used in components for layout transitions, exit animations,
+ * and orchestrated stagger that's awkward to express in pure CSS.
+ */
+@layer utilities {
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes count-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.06);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-shimmer {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-muted) 25%,
+      color-mix(in oklch, var(--color-muted), white 8%) 37%,
+      var(--color-muted) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  .animate-count-pulse {
+    animation: count-pulse 0.4s ease-out;
+  }
+
+  /* Gradient text for hero/heading emphasis — indigo → emerald, used
+     sparingly (landing page hero, dashboard greeting name) per the "use
+     gradients sparingly" guidance. */
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in oklch, var(--color-primary), var(--color-accent-foreground) 55%)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* Soft glass-morphism card: translucent surface + blur + hairline border.
+     Used for elevated/sticky surfaces (header, hero panels) rather than
+     every card — overusing it would flatten the visual hierarchy. */
+  .glass-card {
+    background-color: color-mix(in oklch, var(--color-card) 72%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in oklch, var(--color-border) 80%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up,
+    .animate-scale-in,
+    .animate-shimmer,
+    .animate-count-pulse {
+      animation: none !important;
+    }
+  }
+
+  /* ── Ambient background animations ──────────────────────────────────────
+   * Slow-moving gradient orbs and mesh shift — create the sense that the
+   * UI is "alive" without distracting from content. Intentionally very
+   * subtle: long durations, low opacity, blur-heavy. */
+
+  @keyframes orb-drift-1 {
+    0%, 100% { transform: translate(0%, 0%) scale(1); }
+    33%       { transform: translate(4%, -6%) scale(1.05); }
+    66%       { transform: translate(-3%, 4%) scale(0.97); }
+  }
+  @keyframes orb-drift-2 {
+    0%, 100% { transform: translate(0%, 0%) scale(1); }
+    40%       { transform: translate(-5%, 5%) scale(1.08); }
+    70%       { transform: translate(3%, -3%) scale(0.95); }
+  }
+  @keyframes orb-drift-3 {
+    0%, 100% { transform: translate(0%, 0%) scale(1); }
+    50%       { transform: translate(6%, 3%) scale(1.04); }
+  }
+
+  @keyframes progress-fill {
+    from { width: 0%; }
+    to   { width: var(--progress-target, 100%); }
+  }
+
+  @keyframes ring-fill {
+    from { stroke-dashoffset: var(--dash-total, 283); }
+    to   { stroke-dashoffset: var(--dash-offset, 0); }
+  }
+
+  @keyframes check-pop {
+    0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+    60%  { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-primary) 30%, transparent); }
+    50%       { box-shadow: 0 0 0 8px color-mix(in oklch, var(--color-primary) 0%, transparent); }
+  }
+
+  @keyframes timer-tick {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+  }
+
+  .animate-orb-1 {
+    animation: orb-drift-1 18s ease-in-out infinite;
+  }
+  .animate-orb-2 {
+    animation: orb-drift-2 24s ease-in-out infinite;
+  }
+  .animate-orb-3 {
+    animation: orb-drift-3 20s ease-in-out infinite;
+  }
+  .animate-progress-fill {
+    animation: progress-fill 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-check-pop {
+    animation: check-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  .animate-timer-tick {
+    animation: timer-tick 1s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-orb-1,
+    .animate-orb-2,
+    .animate-orb-3,
+    .animate-progress-fill,
+    .animate-check-pop,
+    .animate-pulse-glow,
+    .animate-timer-tick {
+      animation: none !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Accordion open/close animation — driven by radix's data-state attribute
+   * and its --radix-accordion-content-height CSS variable, which radix sets
+   * automatically based on the content's measured height. */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-accordion-down,
+    .animate-accordion-up {
+      animation: none !important;
+    }
+  }
+}
