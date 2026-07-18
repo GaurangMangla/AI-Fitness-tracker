@@ -1,0 +1,42 @@
+# Athlyt — Development overrides
+#
+# Applied automatically by `docker compose up` in addition to docker-compose.yml.
+# Provides hot-reload for backend and frontend during local development.
+#
+# Usage:
+#   docker compose up          # uses this file automatically
+#   docker compose -f docker-compose.yml up   # production config only (skips this)
+
+services:
+
+  # ── Backend (dev) ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: local
+      DEBUG: "true"
+    volumes:
+      # Hot-reload: mount source so code changes reflect without rebuild
+      - ./backend:/app
+      # Mount ml models directory
+      - ./ml/models:/app/ml/models:ro
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # ── Frontend (dev) ─────────────────────────────────────────────────────
+  frontend:
+    # In development, build from the dev stage (no standalone output needed)
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Hot-reload: mount source, but keep node_modules from the container
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+    command: npm run dev

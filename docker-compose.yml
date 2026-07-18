@@ -1,0 +1,113 @@
+# Athlyt — Docker Compose
+#
+# Three services: postgres, backend (FastAPI), frontend (Next.js).
+#
+# Quick start:
+#   cp backend/.env.example backend/.env   # then set JWT_SECRET_KEY
+#   docker compose up --build
+#
+# Access:
+#   Frontend  → http://localhost:3000
+#   Backend   → http://localhost:8000
+#   API docs  → http://localhost:8000/docs
+#   Database  → localhost:5432 (user: athlyt, db: athlyt)
+
+services:
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: athlyt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-athlyt_dev_password}
+      POSTGRES_DB: athlyt
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Expose to host so you can connect with psql or pgAdmin during development.
+      # Remove this in production (the backend reaches postgres via the Docker network).
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U athlyt -d athlyt"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Backend (FastAPI) ──────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # App
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DEBUG: ${DEBUG:-false}
+      # Database — uses the postgres service name as the hostname
+      DATABASE_URL: postgresql+psycopg2://athlyt:${POSTGRES_PASSWORD:-athlyt_dev_password}@postgres:5432/athlyt
+      # Auth
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in your .env file}
+      # CORS — allow the frontend origin
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      # Allowed Host header values — "*" is fine inside Docker's internal
+      # network where the frontend calls the backend by service name, but
+      # set to your real domain if this container is ever exposed directly.
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-*}
+      # Recommendation engine — "ml" (default) with automatic fallback to
+      # the rule engine, or "rule" for an instant rollback with zero code
+      # changes. See ml/models/PRODUCTION_ROLLOUT.md.
+      RECOMMENDATION_ENGINE: ${RECOMMENDATION_ENGINE:-ml}
+      # ML model + preprocessor paths — must match the volume mount below
+      # (./ml/models -> /app/ml/models). Tracked via Git LFS; run
+      # `git lfs pull` before `docker compose up` or these resolve to small
+      # LFS pointer files, not the real model (handled gracefully — falls
+      # back to the rule engine — but ML predictions won't work until pulled).
+      ML_MODEL_PATH: /app/ml/models/model.joblib
+      ML_PREPROCESSOR_PATH: /app/ml/models/preprocessor.joblib
+    volumes:
+      # Mount the shared ml/models directory so the backend can load the
+      # trained model artifact without embedding it in the image.
+      - ./ml/models:/app/ml/models:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ── Frontend (Next.js) ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* vars are baked into the JS bundle at build time —
+        # they cannot be changed at runtime without rebuilding the image.
+        # In production, set this to your actual backend URL.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api/v1}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,19 @@
+# Frontend Dockerfile — development only
+# Used by docker-compose.override.yml for hot-reload during local development.
+# The production build uses Dockerfile (3-stage standalone).
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy manifests and install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Source is mounted as a volume at runtime by docker-compose.override.yml,
+# so we don't COPY it here — changes are picked up immediately.
+
+EXPOSE 3000
+
+ENV NEXT_TELEMETRY_DISABLED=1
+
+CMD ["npm", "run", "dev"]
