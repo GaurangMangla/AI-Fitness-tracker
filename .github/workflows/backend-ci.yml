@@ -1,0 +1,62 @@
+name: Backend CI
+
+# Runs on every push and pull request that touches backend code.
+# Path filtering avoids wasting CI minutes on frontend-only or docs-only changes.
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  test:
+    name: pytest / ruff / black
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # RECOMMENDATION_ENGINE now defaults to "ml" (see app/core/config.py) —
+          # without this, ml/models/*.joblib checks out as small Git LFS
+          # pointer files, not the real model, and CI would only ever
+          # exercise the fallback path (still correct, but never actually
+          # validates the real ML prediction path end-to-end).
+          lfs: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          # Caches pip downloads keyed on pyproject.toml — a dependency-only
+          # change gets a fresh cache; a code-only change reuses it.
+          cache: "pip"
+          cache-dependency-path: "backend/pyproject.toml"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run pytest
+        run: pytest -q
+        env:
+          # Same values tests/conftest.py already sets as defaults — set here
+          # explicitly so the workflow doesn't silently depend on that fallback.
+          JWT_SECRET_KEY: test-secret-key-at-least-32-characters-long
+          DATABASE_URL: "sqlite:///:memory:"
+          ENVIRONMENT: test
+
+      - name: Run ruff
+        run: ruff check .
+
+      - name: Run black (check only, no reformatting)
+        run: black --check .

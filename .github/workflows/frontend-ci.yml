@@ -1,0 +1,49 @@
+name: Frontend CI
+
+# Runs on every push and pull request that touches frontend code.
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  build:
+    name: install / lint / build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # Caches ~/.npm keyed on package-lock.json — reused across runs
+          # until a dependency actually changes.
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build (type-check + production build)
+        run: npm run build
+        env:
+          # Falls back to localhost inside lib/api-client.ts if unset, but set
+          # explicitly here so CI mirrors what a real deploy's build step sees.
+          NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
