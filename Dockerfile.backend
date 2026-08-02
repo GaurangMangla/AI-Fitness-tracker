@@ -1,0 +1,40 @@
+# ── Stage 1: Builder ───────────────────────────────────────────────────────
+# Build context: repo root. Copies from backend/ subdirectory.
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency manifest from backend/ (build context = repo root)
+COPY backend/pyproject.toml backend/README.md ./
+RUN mkdir -p app && touch app/__init__.py
+
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --prefix=/install .
+
+
+# ── Stage 2: Runtime ───────────────────────────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+RUN useradd --create-home --shell /bin/bash athlyt
+
+WORKDIR /app
+
+COPY --from=builder /install /usr/local
+
+# Copy entire backend source into /app
+COPY --chown=athlyt:athlyt backend/ .
+
+USER athlyt
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD python -c \
+    "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')" \
+    || exit 1
+
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"]
