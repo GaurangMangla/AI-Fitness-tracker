@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     # --- Database --------------------------------------------------------------
     # SQLite for local dev; swap to a `postgresql://...` URL for production —
     # the ORM models and queries don't change either way.
-    DATABASE_URL: str = "sqlite:///./athlyt.db"
+    DATABASE_URL: str = "sqlite:////tmp/athlyt.db"
 
     # --- Auth / JWT --------------------------------------------------------------
     # A single access token, not access+refresh rotation — the right call for a
@@ -60,7 +60,9 @@ class Settings(BaseSettings):
     # surface area this scope doesn't need yet; the auth module is small enough
     # to extend with it later without a rewrite if the project grows past the
     # placement-portfolio stage.
-    JWT_SECRET_KEY: str = Field(min_length=32)
+    JWT_SECRET_KEY: str = Field(
+        default="athlyt-default-jwt-secret-key-32-chars-minimum", min_length=32
+    )
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 

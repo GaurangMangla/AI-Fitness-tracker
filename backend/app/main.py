@@ -52,11 +52,12 @@ def _run_local_dev_schema() -> None:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     settings = get_settings()
 
-    if settings.ENVIRONMENT in ("local", "test"):
+    try:
         _run_local_dev_schema()
-
-    with SessionLocal() as db:
-        seed_exercises(db)
+        with SessionLocal() as db:
+            seed_exercises(db)
+    except Exception as e:
+        logger.warning("Startup schema seed warning: %s", e)
 
     logger.info(
         "Athlyt API started — environment=%s, version=%s",
