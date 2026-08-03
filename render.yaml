@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: athlyt-backend
+    runtime: docker
+    dockerfilePath: Dockerfile.backend
+    plan: free
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://ai-fit-tracker-nu.vercel.app
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: RECOMMENDATION_ENGINE
+        value: ml
+      - key: PORT
+        value: "8000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: athlyt-db
+          property: connectionString
+
+databases:
+  - name: athlyt-db
+    databaseName: athlyt
+    user: athlyt
+    plan: free
