@@ -1,5 +1,6 @@
 # Athlyt — API Reference
 
+Base URL (prod): `https://athlyt-backend.vercel.app/api/v1`
 Base URL (dev): `http://localhost:8000/api/v1`
 
 All responses follow one of two shapes:
@@ -8,7 +9,7 @@ All responses follow one of two shapes:
 
 Authentication: `Authorization: Bearer <access_token>` header on all protected endpoints.
 
-Swagger UI available at `http://localhost:8000/docs` when the server is running.
+Swagger UI available at `https://athlyt-backend.vercel.app/docs` (prod) or `http://localhost:8000/docs` (dev).
 
 ---
 

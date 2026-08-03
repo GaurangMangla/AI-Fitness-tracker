@@ -6,7 +6,7 @@
 
 An AI-powered fitness coaching platform — personalised workout plans, nutrition tracking, progress analytics, and workout session management. Built as a production-quality portfolio project demonstrating full-stack + ML engineering.
 
-**🔴 [Live Demo](https://athlyt-taupe.vercel.app)** · **[API Docs](https://athlyt-backend.onrender.com/docs)**
+**🔴 [Live Demo](https://ai-fit-tracker-nu.vercel.app)** · **[API Docs](https://athlyt-backend.vercel.app/docs)**
 
 [![Backend CI](https://github.com/GaurangMangla/AI-Fitness-tracker/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/GaurangMangla/AI-Fitness-tracker/actions/workflows/backend-ci.yml)
 [![Frontend CI](https://github.com/GaurangMangla/AI-Fitness-tracker/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/GaurangMangla/AI-Fitness-tracker/actions/workflows/frontend-ci.yml)
@@ -376,9 +376,9 @@ See `.github/workflows/` for the workflow definitions. CI does not deploy anythi
 ## Deployment
 
 **Currently live:**
-- Frontend: [athlyt-taupe.vercel.app](https://athlyt-taupe.vercel.app) (Vercel)
-- Backend: [athlyt-backend.onrender.com](https://athlyt-backend.onrender.com) (Render)
-- Database: Neon (serverless PostgreSQL)
+- Frontend: [ai-fit-tracker-nu.vercel.app](https://ai-fit-tracker-nu.vercel.app) (Vercel)
+- Backend: [athlyt-backend.vercel.app](https://athlyt-backend.vercel.app) (Vercel Serverless)
+- Database: SQLite / Serverless DB
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete step-by-step guide this deployment followed — exact build/start commands, environment variable reference, security review, custom domain setup, and a 20-item troubleshooting table drawn from real issues hit during this deployment.
 
